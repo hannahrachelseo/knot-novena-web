@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c2f5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="매듭 9일기도">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>매듭을 푸시는 성모님 9일기도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f2e8; --card:#fffdf8; --ink:#2b2a33; --mute:#7c7768; --line:#e7dfcd;
+  --blue:#24407e; --blue2:#3b5ca8; --gold:#b98d2e; --gold2:#e8cf8f; --red:#a8443b;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#e9e2d2;color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:calc(76px + var(--safe-b));padding-top:var(--safe-t)}
+/* splash */
+#splash{position:fixed;inset:0;z-index:100;background:linear-gradient(180deg,#1c2f5e,#2c4a8c 60%,#3a5aa0);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;transition:opacity .7s;color:#fff}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .img{width:min(62vw,250px);aspect-ratio:381/524;border-radius:16px;overflow:hidden;box-shadow:0 0 0 3px rgba(232,207,143,.6),0 18px 50px rgba(0,0,0,.35)}
+#splash .img img,#splash .img svg{width:100%;height:100%;object-fit:cover;display:block}
+#splash p{font-family:'Gowun Batang',serif;text-align:center;line-height:1.8;font-size:17px;margin-top:28px;max-width:300px;letter-spacing:-.2px;animation:rise 1.2s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* header */
+header.top{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px}
+header.top h1{font-family:'Gowun Batang',serif;font-size:19px;margin:0;color:var(--blue)}
+header.top small{display:block;font-size:12px;color:var(--mute);font-family:'Noto Sans KR';margin-top:2px}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--blue)}
+.icon-btn:active{background:#0000000d}
+section.view{display:none;padding:4px 16px 20px}
+section.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+/* today hero */
+.hero{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:0;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;border:2px solid rgba(232,207,143,.35)}
+.hero .lbl{font-size:12px;opacity:.8}
+.hero .big{font-family:'Gowun Batang',serif;font-size:24px;margin:4px 0 2px}
+.hero .sub{font-size:13px;opacity:.9}
+.pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.18);margin-top:10px}
+/* calendar */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-head b{font-size:16px}
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{font-size:11px;text-align:center;color:var(--mute);padding:4px 0}
+.dow:first-child{color:var(--red)}
+.cell{aspect-ratio:1/1.12;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6px;font-size:13px;position:relative}
+.cell .d{font-weight:500}
+.cell .n{font-size:9.5px;color:var(--mute);margin-top:1px}
+.cell .st{width:7px;height:7px;border-radius:50%;margin-top:3px}
+.cell.out{opacity:.25}
+.cell.pre .n{visibility:hidden}
+.cell.today{box-shadow:inset 0 0 0 1.5px var(--blue)}
+.cell.sel{background:var(--blue);color:#fff}
+.cell.sel .n{color:#dfe6f7}
+.st.full{background:var(--gold)}
+.st.part{background:linear-gradient(90deg,var(--gold) 50%,var(--gold2) 50%)}
+.st.miss{background:#d9cfbb}
+.legend{display:flex;gap:12px;font-size:11px;color:var(--mute);margin-top:10px;justify-content:center}
+.legend i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:1px}
+/* checklist */
+.dayinfo h3{margin:0;font-size:16px}
+.dayinfo .meta{font-size:13px;color:var(--mute);margin-top:4px;line-height:1.6}
+.dayinfo .meta b{color:var(--blue)}
+.prog{height:6px;background:#efe7d6;border-radius:9px;margin:12px 0 6px;overflow:hidden}
+.prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#d8b25a);border-radius:9px;transition:width .3s}
+.chk{display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px dashed var(--line)}
+.chk:first-of-type{border-top:0}
+.box{width:24px;height:24px;flex:none;border-radius:7px;border:1.5px solid #c9bfa8;display:grid;place-items:center;transition:.15s}
+.box.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.box[disabled]{opacity:.4}
+.chk .nm{flex:1;font-size:14.5px;text-align:left}
+.chk .nm small{display:block;color:var(--mute);font-size:11.5px}
+.chk .go{font-size:12px;color:var(--blue);padding:6px 8px;border-radius:8px;background:#eef1f8}
+.carry{border-color:#e2c27a;background:#fffaf0}
+.carry .tag{display:inline-block;font-size:11px;background:var(--gold);color:#fff;border-radius:99px;padding:2px 8px;margin-bottom:6px}
+.note{font-size:12px;color:var(--mute);text-align:center;margin:6px 0}
+/* pray tab */
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dbtn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 6px;text-align:center}
+.dbtn .k{font-family:'Gowun Batang',serif;font-size:18px;color:var(--blue)}
+.dbtn .m{font-size:11.5px;color:var(--mute);margin-top:4px}
+.dbtn.cur{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold2)}
+.steps .st-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-top:1px solid var(--line);width:100%;text-align:left}
+.steps .st-row:first-child{border-top:0}
+.num{width:26px;height:26px;border-radius:50%;background:#eef1f8;color:var(--blue);font-size:12px;display:grid;place-items:center;flex:none;font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:14px;font-weight:500;font-size:15px}
+.btn.pri{background:var(--blue);color:#fff}
+.btn.gold{background:var(--gold);color:#fff}
+.btn.ghost{background:#efe9dc;color:var(--ink)}
+.btn.w{width:100%}
+/* knots */
+.field label{font-size:13px;color:var(--mute);display:block;margin:10px 0 6px}
+textarea,input[type=text],input[type=date]{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:15px;background:#fff;color:var(--ink);resize:vertical}
+textarea:focus,input:focus{outline:2px solid var(--gold2);border-color:var(--gold)}
+.knot{position:relative}
+.knot .date{font-size:11.5px;color:var(--mute)}
+.knot .k1{font-size:15px;margin:6px 0;line-height:1.6;white-space:pre-wrap}
+.knot .k2{font-size:14px;line-height:1.6;color:#5b4a1e;background:#fbf3df;border-radius:10px;padding:10px 12px;white-space:pre-wrap}
+.knot .k2:before{content:"풀리면 · ";font-weight:700;color:var(--gold)}
+.knot .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.knot .acts button{font-size:12.5px;padding:7px 11px;border-radius:9px;background:#f1ece1}
+.knot.done{opacity:.85}
+.knot.done .k1{text-decoration:line-through;text-decoration-color:var(--gold)}
+.ribbon{font-size:11px;color:#fff;background:var(--gold);border-radius:99px;padding:2px 8px;margin-left:6px}
+.seg{display:flex;background:#ebe4d4;border-radius:12px;padding:3px;margin:8px 0}
+.seg button{flex:1;padding:8px;border-radius:9px;font-size:13.5px}
+.seg button.on{background:#fff;box-shadow:0 1px 3px #0001;font-weight:700;color:var(--blue)}
+/* tabbar */
+nav.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(255,253,248,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + var(--safe-b));z-index:20}
+nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:#9a937f;padding:6px 0}
+nav.tabs button.on{color:var(--blue);font-weight:700}
+nav.tabs svg{width:24px;height:24px}
+/* reader */
+#reader{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;max-width:480px;margin:0 auto}
+#reader.on{display:flex}
+.r-top{padding:calc(12px + var(--safe-t)) 14px 8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);background:var(--card)}
+.r-top .t{flex:1;text-align:center;font-size:13px;color:var(--mute)}
+.r-top .t b{display:block;color:var(--blue);font-size:14.5px}
+.dots{display:flex;gap:5px;justify-content:center;padding:10px 0 2px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#dcd3bf}
+.dots i.on{background:var(--blue);width:18px;border-radius:9px}
+.dots i.ok{background:var(--gold)}
+.r-body{flex:1;overflow-y:auto;padding:14px 22px 30px}
+.r-foot{display:flex;gap:10px;padding:10px 14px calc(12px + var(--safe-b));border-top:1px solid var(--line);background:var(--card)}
+.r-foot .btn{flex:1}
+.r-foot .btn.ghost{flex:.55}
+.pg-kind{font-size:12px;color:var(--gold);letter-spacing:1px;font-weight:700;text-align:center;margin-top:8px}
+.pg-title{font-family:'Gowun Batang',serif;font-size:23px;color:var(--blue);text-align:center;margin:6px 0 18px;line-height:1.45}
+.pg-dan{font-family:'Gowun Batang',serif;font-size:40px;color:var(--blue2);text-align:center;line-height:1;margin-top:10px}
+.prayer{font-family:'Gowun Batang',serif;font-size:18px;line-height:2;letter-spacing:-.2px;word-break:keep-all}
+.prayer p{margin:0 0 14px}
+.prayer.center{text-align:center}
+.prayer.verse p{margin:0}
+.rubric{font-family:'Noto Sans KR';font-size:13px;color:var(--red);background:#f8e9e5;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.scrip{font-family:'Gowun Batang',serif;color:var(--blue2);font-size:15.5px;line-height:1.8;text-align:center;padding:12px 10px;border-top:1px solid var(--gold2);border-bottom:1px solid var(--gold2);margin:0 0 18px;word-break:keep-all}
+.scrip small{display:block;font-size:12.5px;color:var(--mute);margin-top:4px}
+.medit{font-family:'Gowun Batang',serif;font-size:16.5px;line-height:1.95;word-break:keep-all}
+.medit:first-letter{font-size:34px;color:var(--blue2);float:left;line-height:1;margin:4px 6px 0 0}
+.sec-h{font-size:13px;color:#3a7a3a;font-weight:700;margin:22px 0 8px;padding-bottom:6px;border-bottom:1.5px solid #9cc79c}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0 14px}
+summary{padding:12px 0;font-size:14.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"＋";color:var(--mute)}
+details[open] summary:after{content:"－"}
+details .prayer{font-size:16px;padding-bottom:12px}
+.beads{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:6px 0 4px}
+.bead{width:24px;height:24px;border-radius:50%;border:1.5px solid #b9ad92;background:#fff;transition:.15s}
+.bead.on{background:radial-gradient(circle at 35% 35%,#f3dc9a,var(--gold));border-color:var(--gold)}
+.bead-cap{text-align:center;font-size:12px;color:var(--mute)}
+.final-p{font-family:'Gowun Batang',serif;font-size:16.5px;line-height:1.95;background:#f2f4fa;border-radius:14px;padding:14px 16px;color:#23305a;word-break:keep-all}
+.quote{margin-top:26px;font-size:13.5px;line-height:1.8;color:#8a5a2b;font-family:'Gowun Batang',serif;border-left:3px solid var(--gold2);padding-left:12px}
+.quote small{display:block;color:var(--mute);margin-top:2px}
+.myknots{background:#fffaf0;border:1px dashed #e2c27a;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:16px;line-height:1.6}
+.myknots b{color:var(--gold);font-size:12px}
+.readmode{font-size:12px;color:var(--mute);text-align:center;margin-top:24px}
+.donebanner{text-align:center;padding:30px 10px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(20,25,45,.45);z-index:80;display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 18px calc(22px + var(--safe-b));max-height:88vh;overflow:auto}
+.sheet h3{margin:0 0 6px;font-size:17px}
+.thumb{width:72px;aspect-ratio:381/524;border-radius:10px;overflow:hidden;flex:none;border:1px solid var(--line)}
+.thumb img,.thumb svg{width:100%;height:100%;object-fit:cover;display:block}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#2b2a33;color:#fff;font-size:13px;padding:9px 14px;border-radius:99px;opacity:0;transition:.3s;z-index:90;pointer-events:none}
+.toast.on{opacity:.92}
+
+.st.carry{background:none;width:auto;height:auto;font-size:10px;color:#c0705a;line-height:1;margin-top:2px}
+.cell.sel .st.carry{color:#ffd9c9}
+.cell.fut .n{opacity:.7}
+.carrynote{font-size:12.5px;color:#9a4b36;background:#fbece5;border-radius:10px;padding:8px 10px;margin-top:10px;line-height:1.6}
+.rbar{height:3px;background:#e6dece;border-radius:3px;margin:8px 22px 0;flex-basis:100%}
+.rbar>i{display:block;height:100%;background:var(--gold);border-radius:3px;transition:width .3s}
+.dots{flex-wrap:wrap}
+.paint{margin:0 auto 4px;max-width:min(270px,62vw)}
+.paint img{width:100%;display:block;filter:drop-shadow(0 8px 16px rgba(40,30,10,.28))}
+.hailtext{font-size:15.5px;line-height:1.85;text-align:center;color:#3c3a44;background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.hailtext p{margin:0}
+.decade{position:relative;width:300px;height:300px;margin:14px auto 0}
+.decade .ring{position:absolute;inset:0;width:100%;height:100%}
+#ringFill{transition:stroke-dashoffset .5s ease}
+.hb{position:absolute;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;background:#fff;border:2px solid #cbbd9d;display:grid;place-items:center;font-size:12px;color:#a59b84;z-index:2;transition:background .3s,border-color .3s,box-shadow .3s}
+.hb.on{background:radial-gradient(circle at 35% 30%,#fff3cf,#e2bd62 55%,#b98d2e);border-color:#b98d2e;color:#fff;box-shadow:0 0 14px rgba(232,190,90,.75)}
+.hb.pop{animation:pop .45s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.core{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,#fffaf0,#f3ead6);border:1px solid var(--line);z-index:1;transition:background .6s}
+.cnt b{font-family:'Gowun Batang',serif;font-size:46px;color:var(--blue)}
+.cnt span{font-size:16px;color:var(--mute)}
+.decade.full .core{background:radial-gradient(circle,#fff 0%,#ffe9a8 45%,#e2b54e 100%);border-color:#e2c27a;box-shadow:0 0 40px 10px rgba(255,214,120,.6)}
+.core .dove{width:84px;filter:drop-shadow(0 2px 6px rgba(150,110,20,.5))}
+.core b{font-size:13px;color:#6b4b10;margin-top:4px;letter-spacing:.5px}
+.decade.full .dove{animation:float 2.6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.rays{position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;opacity:0;background:repeating-conic-gradient(rgba(255,215,120,.38) 0deg 6deg,transparent 6deg 18deg);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);transition:opacity .8s}
+.decade.full .rays{opacity:1;animation:spin 30s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sparks{position:absolute;left:50%;top:50%;z-index:3;pointer-events:none}
+.sparks i{position:absolute;width:7px;height:7px;border-radius:50%;background:#ffd56b;opacity:0;box-shadow:0 0 8px #ffd56b}
+.decade.burst .sparks i{animation:spark 1.3s ease-out var(--d) forwards}
+@keyframes spark{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-160px) scale(.3)}}
+.hailmsg{text-align:center;font-size:13.5px;color:var(--mute);margin-top:6px;line-height:1.7;min-height:44px}
+.decade.full + .hailmsg{color:#8a6414;font-family:'Gowun Batang',serif;font-size:15px}
+.btn[disabled]{opacity:.45}
+.bond{background:linear-gradient(180deg,#fffdf8,#f6eedc)}
+.bond-h{font-family:'Gowun Batang',serif;font-size:18px;color:var(--blue);text-align:center}
+.bond-row{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:12px}
+.pslot{width:110px;aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:#efe7d6;border:2px solid #fff;box-shadow:0 4px 14px rgba(60,40,10,.18);position:relative;cursor:pointer;display:block;flex:none}
+.pslot img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;display:block}
+.pslot .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#a59b84;font-size:13px;line-height:1.5}
+.pslot em{position:absolute;left:0;right:0;bottom:0;font-style:normal;font-size:11.5px;color:#fff;text-align:center;padding:14px 0 5px;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.thread{flex:1;max-width:120px;text-align:center}
+.thread svg{width:100%}
+.thread small{font-size:11px;color:var(--gold);display:block;margin-top:-4px}
+.greetprev{margin-top:8px;font-family:'Gowun Batang',serif;font-size:14px;line-height:1.7;text-align:center;color:#fff;background:linear-gradient(180deg,#1c2f5e,#3a5aa0);border-radius:12px;padding:12px}
+</style>
+</head>
+<body>
+<div id="splash"><div class="img" id="splashImg"></div><p id="splashText"></p></div>
+
+<div class="app">
+  <header class="top">
+    <div><h1>매듭을 푸시는 성모님</h1><small>9일 기도 · 9일마다 다시 이어집니다</small></div>
+    <button class="icon-btn" id="setBtn" aria-label="설정"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </header>
+
+  <section class="view on" id="v-cal"></section>
+  <section class="view" id="v-pray"></section>
+  <section class="view" id="v-knot"></section>
+</div>
+
+<nav class="tabs">
+  <button data-v="cal" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>캘린더</button>
+  <button data-v="pray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M7 8h10"/></svg>기도 시작</button>
+  <button data-v="knot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12c3 0 4-5 7-5s3 10 6 10 3-5 5-5"/><circle cx="12" cy="12" r="2.4"/></svg>매듭</button>
+</nav>
+
+<div id="reader">
+  <div class="r-top">
+    <button class="icon-btn" id="rClose" aria-label="닫기"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="t" id="rTitle"></div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="dots" id="rDots"></div>
+  <div class="r-body" id="rBody"></div>
+  <div class="r-foot"><button class="btn ghost" id="rPrev">‹ 이전</button><button class="btn pri" id="rNext"></button></div>
+</div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =================== 기도문 데이터 =================== */
+const SIGN = "성부와 성자와 성령의 이름으로. 아멘.";
+const CONTRITION = ["하느님, 제가 죄를 지어 참으로 사랑받으셔야 할 하느님의 마음을 아프게 하였기에 악을 저지르고 선을 멀리한 모든 잘못을 진심으로 뉘우치나이다.","하느님의 은총으로 속죄하고 다시는 죄를 짓지 않으며 죄지을 기회를 피하기로 굳게 다짐하오니 우리 구세주 예수 그리스도의 수난 공로를 보시고 저에게 자비를 베풀어 주소서. 아멘."];
+
+const COMMON = {
+  lord:"하늘에 계신 우리 아버지, 아버지의 이름이 거룩히 빛나시며 아버지의 나라가 오시며 아버지의 뜻이 하늘에서와 같이 땅에서도 이루어지소서. 오늘 저희에게 일용할 양식을 주시고 저희에게 잘못한 이를 저희가 용서하듯이 저희 죄를 용서하시고 저희를 유혹에 빠지지 않게 하시고 악에서 구하소서. 아멘.",
+  hail:"은총이 가득하신 마리아님, 기뻐하소서! 주님께서 함께 계시니 여인 중에 복되시며 태중의 아들 예수님 또한 복되시나이다. 천주의 성모 마리아님, 이제와 저희 죽을 때에 저희 죄인을 위하여 빌어 주소서. 아멘.",
+  glory:"영광이 성부와 성자와 성령께 처음과 같이 이제와 항상 영원히. 아멘.",
+  fatima:"예수님, 저희 죄를 용서하시며 저희를 지옥 불에서 구하시고 연옥 영혼을 돌보시며 가장 버림받은 영혼을 돌보소서."
+};
+
+const MYST = [
+ {name:"환희의 신비", items:[
+  {t:"마리아께서 예수님을 잉태하심을 묵상합시다", s:"“은총이 가득한 이여, 기뻐하여라. 주께서 너와 함께 계시다.”", r:"루카 1,28",
+   m:"천사들의 모후이신 마리아님, 당신은 가브리엘 천사와 함께 이 땅을 새롭게 다시 태어나게 하는 대화를 나누셨습니다. 두 분의 만남으로 절망과 어둠에 빠져 있던 세상에 빛과 희망이 넘치게 되었습니다. 천사는 하느님의 사자였고, 당신은 인류의 대표였습니다. 가브리엘 천사는 하느님의 어머니가 되어 달라는 그분의 뜻을 당신께 전했습니다. 모든 것이 하느님의 뜻에 따른 섭리임을 아신 당신은 “말씀하신 대로 저에게 이루어지기를 바랍니다”라고 대답하셨습니다. 이때 천사가 건넨 “은총이 가득한 이여”라는 인사말은 우리가 묵주기도를 바칠 때마다 반복하는 기도의 말이 되었습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 겸손의 은총을 얻어 주소서. 그리하여 제가 정성되이 묵주기도를 바칠 수 있게 해주소서."},
+  {t:"마리아께서 엘리사벳을 찾아보심을 묵상합시다", s:"“당신은 여인들 가운데 가장 복되시며 당신 태중의 아기도 복되십니다.”", r:"루카 1,42",
+   m:"기쁨의 원천이신 마리아님, 당신의 엘리사벳 방문은 그 가족들에게 큰 행복이 되었습니다. 성 요한 세례자는 어머니의 태중에서 당신의 인사말을 듣고 ‘뛰놀았습니다.’ 당신의 이름을 입술에 올리는 것만으로도 사람들은 하느님의 더 큰 사랑을 느낄 수 있었습니다. 당신께는 이기심이라고는 전혀 없었습니다. 태중에 이 세상의 창조자를 모시고 있으면서도 당신은 교만하지 않으셨습니다. 당신은 모든 사람을 사랑하셨습니다. 당신은 엘리사벳의 인사말에 하느님의 어머니로서 당신의 소명을 잊지 않으시고, 하느님을 찬양하는 노래(마니피캇)로 응답하셨습니다.\n“내 영혼이 주님을 찬송하고 내 마음이 나의 구원자 하느님 안에서 기뻐 뛰니 그분께서 당신 종의 비천함을 굽어보셨기 때문입니다.”",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 이웃을 사랑하는 은총을 얻어 주소서. 그리하여 제가 저 자신보다는 하느님 안에 있는 이웃을 사랑하게 해주소서."},
+  {t:"마리아께서 예수님을 낳으심을 묵상합시다", s:"“지극히 높은 곳에서는 하느님께 영광 땅에서는 그분 마음에 드는 사람들에게 평화!”", r:"루카 2,14",
+   m:"창조주의 어머니이신 마리아님, 이 세상을 만드신 분이 당신과 성 요셉의 손을 빌어 베들레헴의 구유에 누우셨습니다. 예수님이 이 일을 허락하신 것은 사람들이 그분의 권능과 영광 때문에 눈이 머는 일이 없게 하시려는 뜻이었습니다. 우리와 같은 모습으로 이 세상에 오신 당신의 아드님은 가난한 사람들, 천한 사람들, 단순한 사람들, 이 세상에서 잊혀진 사람들을 멸시하지 않으셨습니다. 그분은 또한 부자와 현자들도 외면하지 않으셨습니다. 그들도 영적으로는 가난한 사람들이었기 때문입니다. 그분을 맞이한 사람들에게 그분은 ‘평화’를 주셨습니다. 아기 예수님은 모든 이를 사랑하셨지만, 모든 사람이 아기를 사랑하지는 않았습니다. 그분을 죽이려 했던 헤로데 같은 사람도 있었습니다.",
+   p:"묵주기도의 모후이신 성모님, 성 요셉과 당신 가까이 구유 앞에서 무릎을 꿇고 청하오니, 저에게 마음이 가난해지는 은총을 당신 아드님에게서 얻어 주소서."},
+  {t:"마리아께서 예수님을 성전에 바치심을 묵상합시다", s:"“(그 구원은) 다른 민족들에게는 계시의 빛이며 당신 백성 이스라엘에게는 영광입니다.”", r:"루카 2,32",
+   m:"죄 없으신 마리아님, 정결 예식이 필요하지 않은 당신과 속량되실 필요가 없으신 당신 아드님이 율법에 순종하셨습니다. 모세의 율법에 따르면, 사내아이를 낳은 여인은 7일 동안 불결한 몸이었고, 그래서 그 후에도 33일이나 더 집 안에 머물러야만 했습니다. 이스라엘의 모든 맏아들은 주님께 봉헌되어야 했고, 산비둘기 한 쌍이나 집비둘기 새끼 두 마리를 제물로 바쳐서 ‘속량’되어야만 했습니다. 이 제물은 어머니와 아기의 순결과 무죄의 상징이었습니다. 그분은 완전무결하신 분이고, 당신은 원죄 없이 잉태되신 분이었습니다. 한나는 당신 아드님에 대해 이야기하였고, 시므온은 예수님 때문에 당신의 영혼이 칼에 꿰찔리듯 아플 것이라고 예언했습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 생각과 말과 행동으로 정결한 은총을 얻어 주소서. 그리하여 제가 육욕의 모든 죄를 피하게 해주소서."},
+  {t:"마리아께서 잃으셨던 예수님을 성전에서 찾으심을 묵상합시다", s:"“그의 말을 듣는 이들은 모두 그의 슬기로운 답변에 경탄하였다.”", r:"루카 2,47",
+   m:"상지의 옥좌이신 마리아님, 당신과 성 요셉이 나자렛을 향해 떠나셨을 때, 열두 살이던 예수님은 예루살렘에 남아 있었습니다. 당신은 예수께서 아무런 말 한마디 없이 혼자 떨어져 있었던 이유를 이해할 수 없으셨습니다. 당신과 성 요셉은 예수님이 당연히 일행 가운데 있으려니 생각하셨습니다. 그러나 예수님은 예루살렘에서 성전으로 올라가 율법 교사들 가운데 앉아서 듣기도 하고 묻기도 하며 지내셨습니다. 예수님의 말을 들은 사람들은 모두 그 슬기로움에 경탄했습니다. 당신은 부모를 애타게 만든 예수님을 가볍게 질책하며 자식을 걱정하는 부모의 본분을 다하셨습니다. 당신의 말씀에 그분은 “저는 제 아버지의 집에 있어야 하는 줄을 모르셨습니까?” 하고 말하셨습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 열정의 은총을 얻어 주소서. 그리하여 제가 하느님의 일들을 열심히 추구하게 해주소서."}
+ ]},
+ {name:"빛의 신비", items:[
+  {t:"예수님께서 세례받으심을 묵상합시다", s:"“이는 내가 사랑하는 아들, 내 마음에 드는 아들이다.”", r:"마태 3,17",
+   m:"그리스도의 어머니이신 마리아님, 자신을 낮추어 우리와 똑같은 사람이 되신 당신의 아드님 예수님께서 다시 한 번 자신을 낮추셨습니다. 메시아를 맞이하도록 사람들을 회개시키고 세례를 베풀던 요한 세례자는 자기에게 오는 죄인들의 무리 속에서 그분을 알아보았습니다. 성부께서는 우리 구원을 위해 그분을 죄인이 되어 물에 잠기게 하셨고, 성자께서는 이를 기꺼이 받아들이셨습니다. 이는 죄인들을 구원하고자 죄인들 틈에서 죄인 아닌 죄인으로 돌아가신 십자가 죽음의 예표였습니다. 성부께서 그분을 사랑하는 아들이라고 부르시고 성령께서 비둘기 형상으로 내려오심으로써 그분이 성자이심이 드러났습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 하느님의 뜻을 위해 자신을 온전히 비우는 참된 가난의 정신을 얻어 주소서."},
+  {t:"예수님께서 카나에서 첫 기적을 행하심을 묵상합시다", s:"“아직 저의 때가 오지 않았습니다.”", r:"요한 2,4",
+   m:"은총의 전달자이신 마리아님, 당신은 이웃에 무엇이 필요한지 늘 눈여겨보시고 보살펴 주시는 분입니다. 그런 당신이 잔칫집에 포도주가 떨어져서 난처해진 사정을 모른 체하고 넘어가실 리가 없었습니다. 당신은 일꾼들에게 “무엇이든지 그가 시키는 대로 하여라.” 하고 이르며 크나큰 신뢰로 아드님께 부탁하셨습니다. 이에 어머니와 사람들을 사랑하시는 예수님께서는 물을 포도주로 변화시키는 놀라운 능력을 보이셨습니다. 이는 예수님이 하느님이심을 알려 주는 첫 기적이었으며, 이로써 믿는 이들의 첫째 자리를 차지하시는 당신의 전구에 힘입어 사람들의 믿음의 눈이 열리기 시작했습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 믿음을 더해 주소서. 그리고 제가 받은 모든 은총이 모두 당신의 전구로 말미암은 것임을 알아 늘 감사하게 하소서."},
+  {t:"예수님께서 하느님 나라를 선포하심을 묵상합시다", s:"“오늘 이 성경 말씀이 너희가 듣는 가운데에서 이루어졌다.”", r:"루카 4,21",
+   m:"그리스도를 따르는 이들의 모범이신 마리아님, 당신의 아드님께서 성부께서 맡기신 일을 시작하셨습니다. 그것은 하느님 나라가 왔다고 선포하는 일이었습니다. 그분은 가난하고 힘없는 이들, 죄인들과 세리들에게 하느님의 자비를 전해 주셨고 구원의 희망을 심어 주셨습니다. 악령과 질병에 시달리는 이들에게 해방과 치유, 그리고 죄의 용서를 선사하셨습니다. 이로써 그분을 찾는 이들은 하느님 나라를 체험하게 되었습니다. 그분이 선포하신 하느님 나라는 어떠한 차별도 없는 나라요, 하느님께서 거저 주시는 사랑의 나라입니다. 예수님을 신뢰하며 찾아오는 사람은 누구나 그 사랑의 나라에 들어갈 수 있습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 제 부족함에 실망하지 않고 하느님의 자비를 신뢰하게 하소서. 그리하여 하느님 사랑 속에서 자유를 누리게 하소서."},
+  {t:"예수님께서 거룩하게 변모하심을 묵상합시다", s:"“이는 내가 사랑하는 아들이니 너희는 그의 말을 들어라.”", r:"마르 9,7",
+   m:"그리스도의 참제자이신 마리아님, 예수님께서는 거룩하고 영광스럽게 변화된 당신의 모습과 구약을 대표하는 엘리야와 모세의 모습을 제자들에게 보여 주셨습니다. 그 자리에서 예수님과 엘리야와 모세가 나눈 대화는 예수님께서 장차 당하실 수난과 죽음에 관한 것이었습니다. 이는 부활의 영광이 십자가와 동떨어진 것이 아님을 알려 주는 가르침이었습니다. 곧, 우리는 예수님과 함께 수난의 고통을 겪어야 그분의 부활에 참여하고 성령에 의해 변모되는 삶을 살 수 있게 된다는 것입니다. 이에 성부께서는 우리가 그러한 각오를 다지며 살도록 “그의 말을 들어라.” 하고 말씀하셨습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 우리가 만나는 일상의 어려움들이 부활의 기쁨과 성령에 의해 변모된 삶을 위한 십자가임을 깨닫게 하소서."},
+  {t:"예수님께서 성체성사를 세우심을 묵상합시다", s:"“이는 너희를 위하여 내어 주는 내 몸이다. …이 잔은 내 피로 맺는 새 계약이다.”", r:"루카 22,19-20",
+   m:"구세주의 어머니이신 마리아님, 우리를 사랑하시는 당신 아드님께서는 인류를 위해 자신을 희생 제물로 바칠 것을 늘 염두에 두셨고, 마침내 성체성사를 세우심으로써 그분의 사랑을 드러내 보이셨습니다. “내가 고난을 겪기 전에 너희와 함께 이 파스카 음식을 먹기를 간절히 바랐다.” 우리를 사랑하신 나머지 인간이 되기를 마다하지 않으신 예수님은 더욱 자신을 낮추시어 당신의 살과 피를 우리가 먹고 마실 참된 양식으로 아낌없이 내어 주셨습니다. 이 큰 사랑은 성체성사를 통해 인류에게 무상으로 주어졌으며, 오늘도 그분을 기념하여 제대 위에서 봉헌하는 미사성제를 통해 끊임없이 주어지고 있습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 겸손된 마음으로 자주 영성체하고 성체를 방문하는 은총을 얻어 주소서. 그리하여 사랑 베풀기를 갈구하시는 그분께 기쁨을 드리게 하소서."}
+ ]},
+ {name:"고통의 신비", items:[
+  {t:"예수님께서 우리를 위하여 피땀 흘리심을 묵상합시다", s:"“…땀이 핏방울처럼 되어 땅에 떨어졌다.”", r:"루카 22,44",
+   m:"고통의 성모님, 당신의 아드님이 겟세마니에서 모든 인간의 죄를 대신 짊어지셨습니다. 그분은 하느님 아버지께 자신을 봉헌한 ‘속죄양’이 되셨습니다. 그분은 사도들 중의 한 사람에게 배반을 당했고, 그분을 따르던 이들에게 버림을 받았습니다. 그분이 따로 떨어져 기도하실 때, 제자들은 그 근처에 있었습니다. 그러나 가까운 제자들인 베드로와 요한과 야고보는 단 한 시간도 예수님과 함께 깨어 있지 못하고 잠에 빠졌습니다. 예수님은 고통의 절정을 혼자 견디셨습니다. 하느님 아버지께 할 수만 있다면 고난의 잔을 거두어 달라고 애원하기도 하셨습니다. 그러나 무엇보다도 아버지의 뜻이 이루어지기를 기도하셨습니다. 예수님은 간절한 기도를 드리시느라 피땀을 흘리기까지 하셨습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 참회의 은총을 얻어 주소서. 그리하여 제가 그리스도의 수난을 가져온 저의 죄를 통회하게 해주소서."},
+  {t:"예수님께서 우리를 위하여 매 맞으심을 묵상합시다", s:"“예수님을 채찍질하게 한 다음 십자가에 못 박으라고 넘겨주었다.”", r:"마태 27,26",
+   m:"고통의 성모님, 당신 아드님이 로마 군인들의 손에 혹독하게 매를 맞으신 것을 당신과 함께 아파합니다. 채찍이 허공을 가를 때마다 예수님의 살갗은 찢겨 나갔으며, 채찍의 줄과 매듭들이 살 속 깊이 파고들며 피가 솟구치고 살점이 떨어져 나갔습니다. 그들은 예수님께 정신을 잃으실 정도로 마구 매질을 해댔습니다. 예수님께서 매질을 견디다 못해 기절하시면, 그들은 그분이 정신을 다시 차리실 때까지 매질을 중단하였습니다. 그리고 정신이 드시면 다시 혹독한 매질을 계속했습니다. 예수님은 가혹한 매질뿐 아니라, 매질을 해대는 이들의 입에서 나오는 더럽고 추악하고 못된 욕설들도 견뎌 내셔야 했습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 인내하는 은총을 얻어 주소서. 그리하여 제가 모든 고통을 인내하며 감수할 수 있게 해주소서."},
+  {t:"예수님께서 우리를 위하여 가시관 쓰심을 묵상합시다", s:"“가시나무로 관을 엮어 그분 머리에 씌우고…”", r:"마태 27,29",
+   m:"고통의 성모님, 원수들이 예수님을 조롱하고 비웃고 욕설까지 퍼부어 댔습니다. 예수님께서 자신을 왕이라고 했다 해서, 그들은 가시로 엮은 관을 그분의 머리 위에 씌우고 찔러 눌렀습니다. 그분께 붉은 망토를 둘러 입히고, 오른손에는 왕의 지팡이라며 갈대를 쥐어 드렸습니다. 그리고 조롱 삼아 그분 앞에 무릎을 꿇고 머리를 숙여 절하는가 하면, 거룩하신 얼굴에 침을 뱉기도 했습니다. 그런 다음에는 예수님의 손에서 갈대를 빼앗아 다시 매질을 했습니다. 그러나 예수님은 자비의 왕으로 묵묵히 그곳에 계셨습니다. 마침내 그분이 정의의 왕이 되실 날이 다가오고 있습니다. 그때에는 저들이 그분의 의로운 분노를 체험하게 될 것입니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 고행의 은사를 얻어 주소서. 그리하여 제가 왕이신 그리스도를 위하여 육체적 고통과 영적 고통을 자발적으로 견디게 해주소서."},
+  {t:"예수님께서 우리를 위하여 십자가 지심을 묵상합시다", s:"“예수님께서는 몸소 십자가를 지시고 ‘해골 터’라는 곳으로 나가셨다. 그곳은 히브리 말로 골고타라고 한다.”", r:"요한 19,17",
+   m:"고통의 성모님, 당신 아드님이 무거운 십자가를 짊어지셨습니다. 예수님은 머리부터 발끝까지 온통 상처투성이였으나, 사람들은 이런 처참한 모습에도 아무런 동정심을 느끼지 않았습니다. 그들은 끊임없이 예수님께 채찍질을 해댔고 별별 짓을 다 했습니다. 그들은 동정심보다는 예수님이 골고타에 도착하기 전에 실신하실까 봐 시몬이라는 키레네 사람을 붙들어 강제로 십자가를 지게 했습니다. 이 고통의 길을 가시는 도중에 예수님과 당신이 만나셨습니다. 예수님은 세 번이나 쓰러지셨고, 베로니카가 예수님의 얼굴을 닦아 드렸습니다. 그분은 이 작은 친절에 보답하여 수건에 자신의 모습을 새겨 주셨고, 통곡하는 여자들에게는 “나 때문에 울지 말고 너희와 너희 자녀들 때문에 울어라.” 하고 위로하셨습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 십자가에 대한 사랑을 얻어 주소서. 그리하여 제가 평생토록 십자가를 지고 살게 해주소서."},
+  {t:"예수님께서 우리를 위하여 십자가에 못 박혀 돌아가심을 묵상합시다", s:"“예수님께서는 신 포도주를 드신 다음에 말씀하셨다. ‘다 이루어졌다.’ 이어서 고개를 숙이시며 숨을 거두셨다.”", r:"요한 19,30",
+   m:"고통의 성모님, 아드님이 달려 있는 십자가 밑에 서 계시는 당신의 마음은 오죽하셨겠습니까? 당신은 예수님의 마지막 말씀을 들으셨습니다. 그분은 하느님 아버지께 무지한 원수들을 용서해 주십사고 기도하셨습니다. 착한 죄수에게는 바로 그날로 자신과 함께 낙원에 들게 되리라고 약속하셨습니다. 그리고 당신에게는 요한을 아들로, 요한에게는 당신을 어머니로 주셨습니다. 고통 중에 하느님께 도움을 청하셨고, 목마름에 시달리셨고, “다 이루어졌다”고 말씀하셨습니다. 마침내 고개를 숙이시며 자신의 영혼을 하늘에 계신 아버지께 넘겨드리셨습니다. 이제 시므온의 예언이 다 이루어졌습니다. 당신의 영혼이 칼에 꿰찔리셨습니다. 그리고 창에 찔린 예수님의 옆구리에서는 물과 피가 흘러나왔습니다. 교회의 탄생이 상징적으로 드러났습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 제게 ‘죽기까지, 십자가에서 죽기까지 순명하는’ 은총을 얻어 주소서."}
+ ]},
+ {name:"영광의 신비", items:[
+  {t:"예수님께서 부활하심을 묵상합시다", s:"“그분께서는 여기에 계시지 않는다. 말씀하신 대로 그분께서는 되살아나셨다.”", r:"마태 28,6",
+   m:"우주의 모후이신 마리아님, 안식일 다음 날에 당신의 거룩하신 아드님 예수님께서 무덤에서 나오셨습니다. 이 거룩한 아침에 당신은 더없이 큰 기쁨을 누리셨습니다. 천사가 신실한 부인들에게 예수님께서 부활하셨다고 알려 주었습니다. 당신은 그 부인들과 함께 예수님께 향료를 발라 드리러 가지 않으셨습니다. 부활하신 예수님께서 당신에게 오셔서 승리의 영광으로 빛나는 상처들을 보여 주셨기에 그럴 필요가 없음을 이미 아신 것입니다. 나중에 예수님께서는 부활하신 자신의 모습을 다른 사람들에게도 보여 주셨습니다. 처음에는 마리아 막달레나에게, 그 다음에는 베드로에게, 그리고 엠마오로 가던 제자들과 사도들에게 보여 주셨습니다. 결국에는 의심하던 토마스가 “저의 주님, 저의 하느님!”이라고 하면서 예수님의 발아래 무릎을 꿇었습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 영적 열정을 새롭게 하는 은총을 얻어 주소서. 그리하여 제가 가톨릭 신앙의 풍요한 선물을 깨닫게 해주소서."},
+  {t:"예수님께서 승천하심을 묵상합시다", s:"“예수님께서는 이렇게 이르신 다음 그들이 보는 앞에서 하늘로 오르셨는데, 구름에 감싸여 그들의 시야에서 사라지셨다.”", r:"사도 1,9",
+   m:"우주의 모후이신 마리아님, 예수님 부활 후 사십 일이 그분을 따르던 사람들에게는 영광의 나날들이었습니다. 예수님은 티베리아스 호숫가에서 베드로를 교회의 으뜸으로, 그리고 자신의 지상 대리자로 세우셨습니다. 스승께서는 갈릴래아의 산에서 사도들에게 명하셨습니다.\n“너희는 온 세상에 가서 모든 피조물에게 복음을 선포하여라. 믿고 세례를 받는 이는 구원을 받고 믿지 않는 자는 단죄를 받을 것이다.”\n그 전에 벌써 그분은 고해성사로 죄를 용서하거나 죄의 용서를 보류하는 권한을 사도들에게 주신 바 있습니다. 이 지상에서 자신의 사명을 마치신 예수님은 손을 들어 제자들에게 강복하시고 하느님께로 승천하셨습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 헛된 집착으로부터 벗어날 수 있는 은총을 얻어 주소서. 그리하여 당신과 하늘나라의 것만 생각하게 해주소서."},
+  {t:"예수님께서 성령을 보내심을 묵상합시다", s:"“그들은 모두 성령으로 가득 차…”", r:"사도 2,4",
+   m:"우주의 모후이신 마리아님, 주님께서 승천하신 후 열흘째 되는 날에, 부활하신 후 오십 일이 되는 날에 당신과 사도들이 다락방에서 함께 기도하고 있을 때 세찬 바람이 불어왔습니다. 그리고 혀 모양의 불길로 성령께서 그 자리에 있던 사람들의 머리 위에 내리셨습니다. 바람과 불은 은총과 거룩함의 상징으로 교회의 사명이 시작되었음을 보여 주었습니다. 예수님은 약속대로 위로자요 스승이며 협조자이신 성령을 보내 주셨습니다. 사도들은 성령의 은사를 받았고, 그리하여 사람들을 구원으로 초대하는 사도직을 수행할 수 있게 되었습니다. 사도들은 그리스도의 증거자로서 이 세상의 모든 민족들에게 달려갔습니다. 복되신 당신께서도 그들과 함께 주님을 증거하셨습니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 성령의 은사를 얻어 주소서. 그리하여 제가 성령의 성전인 제 몸 안에서 성령께서 하시는 말씀을 잘 알아듣게 해주소서."},
+  {t:"예수님께서 마리아를 하늘에 불러올리심을 묵상합시다", s:"“나의 애인이여, 일어나오. 나의 아름다운 여인이여, 이리 와 주오.”", r:"아가 2,10",
+   m:"우주의 모후이신 마리아님, 당신은 아드님께서 승천하신 후에도 여러 해 동안 이 지상에 남아 계셨습니다. 당신은 하늘에 계신 아드님과 함께 지내고 싶은 소망과 지상의 어린 교회를 돌보아야 하는 의무감 사이에서 갈등하셨습니다. 그러나 지상에 계시면서 교회가 세상을 변화시키는 모습을 지켜보는 기쁨도 누리셨습니다. 또한 주님의 사도들과 제자들과 형제들이 주님을 위하여 서슴없이 목숨을 내놓는 것도 보셨습니다. 그리고 에페소에서 사도 요한과 함께 여생을 보내신 뒤, 주님 손에 이끌려 그분이 계신 곳으로 당신의 몸과 영혼은 올라가셨습니다. 오늘날 저희는 당신을 ‘하늘에 오르신 모후님’이라고 경하합니다.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 하늘나라를 갈망하는 은총을 얻어 주소서. 그리하여 제가 이 세상의 어떤 권력과 부와 명예보다도 하늘나라를 갈망하게 해주소서."},
+  {t:"예수님께서 마리아께 천상 모후의 관을 씌우심을 묵상합시다", s:"“태양을 입고 발 밑에 달을 두고 머리에 열두 개 별로 된 관을 쓴 여인이 나타난 것입니다.”", r:"묵시 12,1",
+   m:"우주의 모후이신 마리아님, 하느님 계신 곳으로 올라가신 당신은 하늘과 땅의 모후가 되셨습니다. 당신의 아드님은 자신의 다스림에 속해 있는 모든 피조물을 당신의 손길에 맡겨 드렸습니다. 당신은 ‘은총이 가득하신 분’이시고, 그리스도의 어머니이시고, 구속 사업의 협력자이시며, 악마와 죄와 현세의 욕망과 죽음을 이기신 모후이십니다. 하느님과 인간 사이의 중개자이신 그리스도께서 당신을 모든 은총의 중개자로 삼으셨습니다. 그리하여 당신께서 하늘의 모든 복을 죄인인 저희에게도 나누어 주게 하셨습니다. 당신의 전구를 얻을 수 있는 가장 아름다운 기도는 묵주기도입니다. 저희가 평생토록 묵주기도를 바치도록 해주소서.",
+   p:"묵주기도의 모후이신 성모님, 당신 아드님께 청하시어, 저에게 인내하는 은총을 얻어 주소서. 그리하여 제가 죽은 후 하늘에서 승리의 기쁨을 누리게 해주소서."}
+ ]}
+];
+
+const OPEN = "근심하는 이의 위안이며 도움이신 어머니, 간절히 애원하오니, ";
+const PETITION = [
+ {t:OPEN+"저를 괴롭히고 제 삶을 불행하게 하는 이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서. 하느님의 어머니시며 저의 어머니이신 당신만이 성심에 가득한 사랑의 손으로 이 매듭을 풀어 주실 수 있다고 굳게 믿나이다.\n사랑하올 어머니, 제 매듭을 완전히 건네 드리오니, 이 매듭을 풀어 주시어 제 마음에 평화를 얻어 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"아! 천국에 들어가기를 원하는 이들이여, 마리아를 섬기십시오. 그러면 영원한 생명을 얻을 것입니다.", by:"성 보나벤투라"},
+ {t:OPEN+"저와 제 주변 사람들을 너무나 고통스럽게 하는 이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서. 이 매듭이 생긴 원인을 어머니의 사랑으로 없애 주시고, 이 매듭으로 인한 모든 고통에서 벗어나도록 주님께 전구해 주소서.\n사랑하올 어머니, 어머니의 전구로 얻는 은덕을 결코 잊지 않고 보답하겠나이다. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"주님, 당신의 어머니는 정말 경이롭습니다. 주님이 어머니께 들어가시더니 종이 되어 나오셨습니다.", by:"성 에프렘 부제"},
+ {t:OPEN+"제게 연민의 눈길을 돌리시어, 제 삶의 이 매듭을(문제를 구체적으로 말씀드린다) 어머니의 거룩한 손길로 풀어 주소서. 이 매듭을 만든 모든 사람과 모든 원인을 제가 용서하도록 도와주소서.\n사랑하올 어머니, 간절한 마음으로 청하오니, 제 앞에 덫을 놓아 주님과 어머니께로부터 저를 떼어 놓는 이 매듭을 풀어 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"하와의 불순종으로 맺어졌던 매듭이 마리아의 순종으로 풀어졌다.", by:"성 이레네오"},
+ {t:OPEN+"이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서. 이 매듭이 제 마음의 평화와 기쁨과 사랑을 앗아가고, 저를 좌절시키고 망가뜨리며, 주님과 어머니께 나아가서 섬기려는 제 발걸음을 얼마나 방해하는지 어머니께서는 잘 아시나이다.\n사랑하올 어머니, 제 몸과 마음과 영혼이 온전히 치유되도록 제 악습도(고치고 싶은 악습과 약점을 말씀드린다) 이 매듭과 함께 어머니께 바치오니 풀어 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"성모님께 바치는 모든 공경은 하늘의 임금님께로 올라갑니다.", by:"성 알퐁소 데 리구오리"},
+ {t:OPEN+"지금 제게 연민의 눈길을 돌리시어, 이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서. 주님의 자녀로 존엄하게 살며 영광을 드리려는 저를 한없이 방해하는 직접적이고 간접적인 온갖 악한 매듭을 끊어 주소서.\n사랑하올 어머니, 이 매듭을 풀어 주시어, 하느님 아버지와 우리 주 예수님과 성령께 가까이 다가가게 해 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"하느님께 무엇을 바치려거든 먼저 그것을 마리아의 손에 맡기십시오.", by:"클레르보의 성 베르나르도"},
+ {t:OPEN+"어머니의 손에 제 삶의 이 매듭을(문제를 구체적으로 말씀드린다) 드리오니 풀어 주소서. 우주 만물의 창조주시며 주인이신 분께 선택되신 어머니의 사랑으로 할 수 없는 일이 그 어디에 있나이까!\n사랑하올 어머니, 이 매듭이 제 삶에 가져온 악을 그 누구보다 잘 아시오니, 제 삶의 끈을 받으시고 모든 고통에서 저를 구해 주소서. 오늘 그리고 제 삶의 모든 날에 저와 함께해 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"마리아라는 이름은 천국의 문을 여는 열쇠입니다.", by:"성 에프렘 부제"},
+ {t:OPEN+"이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서. 매일 저를 힘들게 하고, 감사와 기쁨과 사랑과 평화를 앗아가며, 주님께로부터 멀어지게 하는 잠재의식 속의 매듭도 풀어 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"마리아님, 당신 태중의 열매는 가을철의 결실이 아니라 불멸의 씨앗입니다. 자연이 선사한 종자가 아니라 하느님의 씨앗으로 피어난 꽃입니다.", by:"안키라의 성 테오도토"},
+ {t:OPEN+"저를 불쌍히 여기시어 제 삶의 이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서.\n사랑하올 어머니, 주님께서 지상에서 사시는 동안 일으키신 첫 기적은 어머니의 부탁으로 인한 것이니, 저를 위한 기적도 전구해 주소서. 오셔서 제 매듭을 풀어 주시고, 제 삶의 물독을 채우고 있는 고난과 고통의 물이 감사와 기쁨의 포도주가 되도록 주님께 전구해 주소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"슬픔을 거두어라. 나는 내 아들 곁에서 너희의 변호자가 될 것이다.", by:"로마노 멜로디(+560)"},
+ {t:OPEN+"지금 어머니께 드리는 이 매듭을(문제를 구체적으로 말씀드린다) 어머니의 무한한 자애로 풀어 주소서. 저를 향한 어머니의 사랑과 연민을 믿고 청하오니, 제 눈물을 닦아 주시고 제 마음을 희망으로 가득 채워 주소서.\n사랑하올 어머니, 제 삶이 처음 시작될 때처럼 어머니가 필요하오니, 제 삶 안으로 들어오소서. 매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.",
+  q:"지금 나에게 가장 큰 위안이 되는 것은 나를 마리아께 완전히 봉헌했다는 것입니다.", by:"교황 레오 13세의 임종 시 말씀"}
+];
+
+const FINAL = [
+ ["곤경에 처한 자녀를 결코 외면하지 않으시며,","도움과 보호와 은덕을 간청하는 자녀에게","도움의 손길을 결코 멈추지 않으시는","사랑의 어머니,"],
+ ["제게 연민의 눈길을 보여 주시고","제 삶에 놓인 헝클어진 매듭을 보아 주소서.","이 매듭 때문에 제가 어떠한 절망과 고통과 좌절을","겪고 있는지 어머니는 아시나이다."],
+ ["자녀들의 삶에 놓인 매듭을 푸는 임무를","주님께로부터 받으신 어머니,","제 삶의 끈을 어머니의 손에 드리오니","이 매듭을(문제를 구체적으로 말씀드린다) 풀어 주소서."],
+ ["어머니의 아드님이시며 저의 구세주이신","주님께 전구해 주소서.","이 매듭을 풀어 주시어","주님께 영광을 드리게 하소서."],
+ ["어머니는 저의 희망, 근심하는 이의 위안,","약한 저를 위한 피신처, 슬픔의 치유자,","그리스도와 저를 갈라놓는 모든 것에서","구해 주는 분이시니,","제 간청에 귀를 기울이시어","이 매듭을 풀어 주소서.","매듭을 푸시는 성모님, 저를 위하여 빌어 주소서.","아멘."]
+];
+
+/* =================== 상태 =================== */
+const KEY = "knotNovena.v2";
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const TODAY = ymd(new Date());
+const DEF = {anchor:TODAY, anchorK:1, uname:"", bname:"", prog:{}, doneOn:{}, hail:{}, knots:[], img:null, photoMe:null, photoMary:null};
+let S = (()=>{ try{ const o=JSON.parse(localStorage.getItem(KEY));
+  if(o && o.name && o.uname===undefined){ const p=o.name.trim().split(/\s+/); o.bname=p.length>1?p.pop():""; o.uname=p.join(" "); }
+  return Object.assign({},DEF,o||{}); }catch(e){ return {...DEF}; } })();
+const who=()=>[S.uname,S.bname].map(x=>(x||"").trim()).filter(Boolean).join(" ");
+const greet=n=>n?`매듭을 푸시는 성모님,<br>당신의 자녀 ${esc(n)}의<br>기도를 들어주소서.`:`매듭을 푸시는 성모님,<br>당신의 자녀의<br>기도를 들어주소서.`;
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("저장 공간이 부족해요. 사진 크기를 줄여 주세요"); } }
+let FIRST=false; try{ FIRST=!localStorage.getItem(KEY); }catch(e){}
+if(FIRST) save();
+
+const STEPS = ["성호경","통회기도","1단","2단","3단","어머니께 드리는 청원","4단","5단","매듭을 푸시는 성모님께 드리는 기도"];
+const DAN = {2:0,3:1,4:2,6:3,7:4};
+
+/* 날짜 */
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d);};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return ymd(d);};
+function ymdArr(s){const [y,m,d]=s.split("-").map(Number);return [y,m-1,d];}
+const diff=(a,b)=>Math.round((Date.UTC(...ymdArr(b))-Date.UTC(...ymdArr(a)))/864e5);
+function fmt(s,withDow){ const d=parse(s); const w="일월화수목금토"[d.getDay()]; return `${d.getMonth()+1}월 ${d.getDate()}일${withDow?` (${w})`:""}`; }
+
+/* ---- 순서 규칙 ----
+   기준일(anchor)에 누적 anchorK일차.
+   그날 9가지를 다 마치면 다음 날은 다음 일차로 넘어가고,
+   다 마치지 못하면 다음 날 같은 기도를 이어서 합니다(원래 기도는 하루씩 뒤로 밀림). */
+let KMAP=null;
+function buildMap(){
+  KMAP={}; if(S.anchor>TODAY) return;
+  let k=S.anchorK;
+  for(let d=S.anchor; d<TODAY; d=addDays(d,1)){ KMAP[d]=k; if(S.doneOn[k] && S.doneOn[k]<=d) k++; }
+  KMAP[TODAY]=k;
+}
+function kFor(s){
+  if(!KMAP) buildMap();
+  if(s<S.anchor){ const k=S.anchorK-diff(s,S.anchor); return k>=1?k:null; }
+  if(KMAP[s]) return KMAP[s];
+  if(S.anchor>TODAY) return S.anchorK+diff(S.anchor,s);
+  return KMAP[TODAY]+diff(TODAY,s);           // 앞으로의 날짜(예상)
+}
+const kToday=()=>kFor(TODAY);
+const dayOfK=k=>((k-1)%9)+1;
+const novDay=s=>{const k=kFor(s);return k?dayOfK(k):null;};
+const mystOf=day=>MYST[(day-1)%4];
+function stepLabel(i,day){ return DAN[i]!==undefined ? `${mystOf(day).name} ${STEPS[i]}` : STEPS[i]; }
+const progOf=k=>(S.prog[k]||Array(9).fill(false)).slice();
+const doneCnt=k=>progOf(k).filter(Boolean).length;
+function setStep(k,i,val){
+  const c=progOf(k); c[i]= val===undefined?!c[i]:val; S.prog[k]=c;
+  if(c.every(Boolean)){ if(!S.doneOn[k]) S.doneOn[k]=TODAY; } else delete S.doneOn[k];
+  save(); KMAP=null;
+}
+/* 날짜 상태 */
+function statusOf(s){
+  const k=kFor(s); if(!k || s>TODAY) return "";
+  if(S.doneOn[k]===s) return "full";
+  if(s<S.anchor) return S.doneOn[k]?"full":"";
+  if(s===TODAY) return doneCnt(k)?"part":"";
+  return "carry";                    // 그날 못 마쳐서 다음 날로 이어짐
+}
+const carriedToday=()=>{ const y=addDays(TODAY,-1); return y>=S.anchor && kFor(y)===kToday(); };
+
+/* =================== 공통 =================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rub=s=>esc(s).replace(/\(([^)]*말씀드린다)\)/g,'<span class="rubric">($1)</span>');
+const paras=s=>s.split("\n").map(p=>`<p>${rub(p)}</p>`).join("");
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1900);}
+const CHECK_SVG='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l5 5 9-10"/></svg>';
+const maryHTML=()=>`<img src="${S.img||"img/mary.jpg"}" alt="매듭을 푸시는 성모님">`;
+const DOVE=`<svg viewBox="0 0 100 70" class="dove"><path fill="#fff" d="M52 30c-6-10-16-20-34-24 6 8 10 16 22 22-10-2-20 0-30 6 12 2 22 2 30 0-4 6-6 12-4 20 6-6 10-12 14-16 6 6 14 10 26 10-4-4-8-8-10-12 8-2 16-6 22-12-12 2-22 4-30 4 4-8 12-16 22-22-14 4-22 12-28 24z"/></svg>`;
+function resizeFile(f,max,cb){ const rd=new FileReader(); rd.onload=()=>{ const im=new Image(); im.onload=()=>{ const c=document.createElement("canvas"); const sc=Math.min(1,max/Math.max(im.width,im.height)); c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc); c.getContext("2d").drawImage(im,0,0,c.width,c.height); cb(c.toDataURL("image/jpeg",.84)); }; im.src=rd.result; }; rd.readAsDataURL(f); }
+
+/* =================== 스플래시 =================== */
+$("#splashImg").innerHTML=maryHTML();
+$("#splashText").innerHTML=greet(who());
+setTimeout(()=>$("#splash").classList.add("hide"),2000);
+setTimeout(()=>$("#splash").remove(),2800);
+if(FIRST && !S.uname) setTimeout(()=>openSettings(true),2300);
+
+/* =================== 탭 =================== */
+let curView="cal";
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+function show(v){ curView=v; document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
+  rerender(); window.scrollTo(0,0); }
+function rerender(){ KMAP=null; ({cal:renderCal,pray:renderPray,knot:renderKnots})[curView](); }
+
+/* =================== 캘린더 =================== */
+let calMonth=TODAY.slice(0,7), selDate=TODAY;
+function firstUndone(k){ const c=progOf(k); const i=c.indexOf(false); return i<0?0:i; }
+function checklistHTML(s){
+  const k=kFor(s), day=dayOfK(k), live=k===kToday(), ch=(s<=TODAY||live)?progOf(k):Array(9).fill(false);
+  return STEPS.map((_,i)=>`<div class="chk">
+    <button class="box ${ch[i]?"on":""}" ${live?"":"disabled"} data-tog="${k}|${i}" aria-label="체크">${ch[i]?CHECK_SVG:""}</button>
+    <button class="nm" data-open="${day}|${i}|${live?k:""}">${i+1}. ${esc(stepLabel(i,day))}</button>
+    <button class="go" data-open="${day}|${i}|${live?k:""}">기도문</button></div>`).join("");
+}
+function dayCardHTML(s){
+  const k=kFor(s);
+  if(!k) return `<div class="card dayinfo"><h3>${fmt(s,true)}</h3><div class="meta">9일기도를 시작하기 전이에요.</div></div>`;
+  const day=dayOfK(k), live=k===kToday(), st=statusOf(s), dc=(s<=TODAY||live)?doneCnt(k):0;
+  const round=Math.floor((k-1)/9)+1;
+  let note="";
+  if(st==="carry") note=`<div class="carrynote">↻ 이날 다 마치지 못해서 이 기도가 다음 날로 이어졌어요.</div>`;
+  else if(s>TODAY) note=`<div class="note">예정된 기도예요. 앞의 기도를 못 마치면 하루씩 뒤로 밀려요.</div>`;
+  else if(s<TODAY && st==="full") note=`<div class="note">이날 모두 마쳤어요 ✿</div>`;
+  if(s===TODAY && carriedToday()) note=`<div class="carrynote">↻ 어제 다 마치지 못한 제${day}일 기도를 오늘 이어서 해요. 원래 오늘 기도는 내일로 미뤄졌어요.</div>`;
+  return `<div class="card dayinfo">
+    <h3>${fmt(s,true)}${s===TODAY?' · 오늘':''}</h3>
+    <div class="meta">누적 <b>${k}일차</b> · ${round}번째 9일기도의 <b>제${day}일</b> · <b>${mystOf(day).name}</b></div>
+    ${note}
+    <div class="prog"><i style="width:${dc/9*100}%"></i></div>
+    <div class="note" style="text-align:right;margin:0 0 4px">${dc} / 9</div>
+    ${checklistHTML(s)}
+  </div>`;
+}
+function renderCal(){
+  const [y,m]=calMonth.split("-").map(Number); const first=new Date(y,m-1,1); const last=new Date(y,m,0).getDate();
+  let cells="일월화수목금토".split("").map(d=>`<div class="dow">${d}</div>`).join("");
+  for(let i=0;i<first.getDay();i++) cells+=`<div></div>`;
+  for(let d=1;d<=last;d++){
+    const s=`${y}-${pad(m)}-${pad(d)}`, k=kFor(s), st=statusOf(s);
+    cells+=`<button class="cell ${k?"":"pre"} ${s===TODAY?"today":""} ${s===selDate?"sel":""} ${s>TODAY?"fut":""}" data-d="${s}">
+      <span class="d">${d}</span><span class="n">${k?`제${dayOfK(k)}일`:"·"}</span><span class="st ${st}">${st==="carry"?"↻":""}</span></button>`;
+  }
+  const kt=kToday(), tday=dayOfK(kt), dc=doneCnt(kt);
+  $("#v-cal").innerHTML=`
+   <div class="card hero"><div class="lbl">오늘의 기도 · ${fmt(TODAY,true)}</div>
+     <div class="big">제${tday}일 · ${mystOf(tday).name}</div>
+     <div class="sub">누적 ${kt}일차 · ${dc===9?"오늘 기도를 모두 마쳤어요 ✿":`${dc}/9 마침`}</div>
+     ${carriedToday()?'<div class="pill" style="background:rgba(232,207,143,.35)">↻ 어제 기도 이어서</div> ':''}
+     <button class="pill" data-open="${tday}|${firstUndone(kt)}|${kt}" style="color:#fff">▶ ${dc?"이어서":"오늘"} 기도하기</button></div>
+   <div class="card">
+     <div class="cal-head"><button class="icon-btn" id="pm">‹</button><b>${y}년 ${m}월</b><button class="icon-btn" id="nm">›</button></div>
+     <div class="grid7">${cells}</div>
+     <div class="legend"><span><i style="background:var(--gold)"></i>모두 마침</span><span><i style="background:linear-gradient(90deg,var(--gold) 50%,var(--gold2) 50%)"></i>하는 중</span><span><i style="background:#e9b9a6"></i>다음 날로 이어짐</span></div>
+   </div>
+   ${dayCardHTML(selDate)}`;
+  $("#pm").onclick=()=>{const d=new Date(y,m-2,1);calMonth=`${d.getFullYear()}-${pad(d.getMonth()+1)}`;renderCal();};
+  $("#nm").onclick=()=>{const d=new Date(y,m,1);calMonth=`${d.getFullYear()}-${pad(d.getMonth()+1)}`;renderCal();};
+  document.querySelectorAll(".cell[data-d]").forEach(c=>c.onclick=()=>{selDate=c.dataset.d;renderCal();});
+}
+
+/* 위임 클릭 */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-tog]"); if(t && !t.disabled){ const [k,i]=t.dataset.tog.split("|").map(Number); setStep(k,i); if(doneCnt(k)===9) toast(`제${dayOfK(k)}일 기도를 모두 마쳤어요 ✿`); rerender(); return; }
+  const o=e.target.closest("[data-open]"); if(o){ const [d,i,k]=o.dataset.open.split("|"); openReader(+d,+i,k?+k:null); }
+});
+
+/* =================== 기도 시작 =================== */
+let praySel=null;
+function renderPray(){
+  const kt=kToday(), tday=dayOfK(kt);
+  if(praySel){
+    const day=praySel, ctx=day===tday?kt:null, ch=ctx?progOf(ctx):Array(9).fill(false);
+    $("#v-pray").innerHTML=`<button class="btn ghost" id="back" style="margin-top:4px">‹ 1~9일 목록</button>
+     <div class="card hero" style="margin-top:12px"><div class="lbl">9일기도</div><div class="big">제${day}일</div><div class="sub">${mystOf(day).name}${ctx?" · 오늘 기도라 체크가 기록돼요":" · 읽기 모드"}</div></div>
+     <div class="card steps">${STEPS.map((_,i)=>`<button class="st-row" data-open="${day}|${i}|${ctx||""}"><span class="num" style="${ch[i]?"background:var(--gold);color:#fff":""}">${ch[i]?"✓":i+1}</span><span style="flex:1">${esc(stepLabel(i,day))}${DAN[i]!==undefined?'<small style="display:block;color:var(--mute);font-size:11.5px">그림·말씀 · 묵상 · 주님의 기도 · 성모송 10번 · 영광송 · 구원을 비는 기도 · 모후께 청하는 기도</small>':""}</span><span style="color:var(--mute)">›</span></button>`).join("")}</div>
+     <button class="btn pri w" data-open="${day}|${ctx?firstUndone(ctx):0}|${ctx||""}">${ctx&&doneCnt(ctx)?"이어서 기도하기":"처음부터 차례로 기도하기"}</button>`;
+    $("#back").onclick=()=>{praySel=null;renderPray();};
+    return;
+  }
+  $("#v-pray").innerHTML=`
+   <div class="card hero"><div class="lbl">오늘 · ${fmt(TODAY,true)} · 누적 ${kt}일차</div><div class="big">제${tday}일 · ${mystOf(tday).name}</div>
+     <div class="sub">${doneCnt(kt)}/9 마침${carriedToday()?" · 어제 기도 이어서":""}</div>
+     <button class="pill" style="color:#fff" data-open="${tday}|${firstUndone(kt)}|${kt}">▶ 오늘 기도 시작</button></div>
+   <div class="days">${Array.from({length:9},(_,k)=>k+1).map(d=>`<button class="dbtn ${d===tday?"cur":""}" data-day="${d}"><div class="k">제${d}일</div><div class="m">${mystOf(d).name}</div></button>`).join("")}</div>
+   <p class="note" style="margin-top:14px;line-height:1.7">매일 순서: 성호경 → 통회기도 → 묵주기도 1·2·3단 → 어머니께 드리는 청원 → 4·5단 → 매듭을 푸시는 성모님께 드리는 기도<br>각 단은 그림·말씀 → 묵상 → 주님의 기도 → 성모송 10번 → 영광송 → 구원을 비는 기도 → 묵주기도의 모후께 청하는 기도 순서로 한 장씩 넘어가요.</p>`;
+  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{praySel=+b.dataset.day;renderPray();});
+}
+
+/* =================== 기도문 리더 =================== */
+const DAN_PAGES=["pic","medit","lord","hail","glory","fatima","queen"];
+const DAN_PAGE_NAMES={pic:"그림과 말씀",medit:"묵상",lord:"주님의 기도",hail:"성모송 10번",glory:"영광송",fatima:"구원을 비는 기도",queen:"묵주기도의 모후께 청하는 기도"};
+function buildPages(){
+  const P=[{step:0,kind:"sign"},{step:1,kind:"contrition"}];
+  const dan=(st,d)=>DAN_PAGES.forEach((kind,j)=>P.push({step:st,kind,dan:d,j}));
+  dan(2,0);dan(3,1);dan(4,2); P.push({step:5,kind:"petition"}); dan(6,3);dan(7,4); P.push({step:8,kind:"final"});
+  P.forEach((p,i)=>p.last=!P[i+1]||P[i+1].step!==p.step);
+  return P;
+}
+const PAGES=buildPages();
+let R={day:1,p:0,ctx:null};
+const memHail={};
+function hailKey(dan){ return R.ctx?`${R.ctx}-${dan}`:`r${R.day}-${dan}`; }
+function getHail(dan){ const key=hailKey(dan); return R.ctx?(S.hail[key]||0):(memHail[key]||0); }
+function setHail(dan,n){ const key=hailKey(dan); if(R.ctx){S.hail[key]=n;save();} else memHail[key]=n; }
+
+function openReader(day,step,ctx){ R={day,p:PAGES.findIndex(p=>p.step===step),ctx}; $("#reader").classList.add("on"); document.body.style.overflow="hidden"; drawReader(); }
+function closeReader(){ $("#reader").classList.remove("on"); document.body.style.overflow=""; rerender(); }
+$("#rClose").onclick=closeReader;
+$("#rPrev").onclick=()=>{ if(R.p>0){R.p--;drawReader();} };
+$("#rNext").onclick=()=>{
+  if(R.p>=PAGES.length){ closeReader(); return; }
+  const pg=PAGES[R.p];
+  if(R.ctx && pg.last){ setStep(R.ctx,pg.step,true); }
+  R.p++; drawReader();
+};
+function openKnotsHTML(){ const k=S.knots.filter(x=>!x.done); if(!k.length) return "";
+  return `<div class="myknots"><b>내가 맡긴 매듭</b><br>${k.slice(0,3).map(x=>"· "+esc(x.knot)).join("<br>")}</div>`; }
+
+function hailPageHTML(day,dan){
+  const n=getHail(dan), R0=118;
+  const beads=Array.from({length:10},(_,i)=>{ const a=-Math.PI/2+i*2*Math.PI/10; const x=Math.cos(a)*R0, y=Math.sin(a)*R0;
+    return `<button class="hb ${i<n?"on":""}" style="left:calc(50% + ${x.toFixed(1)}px);top:calc(50% + ${y.toFixed(1)}px)" data-hb="${i}"><span>${i+1}</span></button>`; }).join("");
+  return `<div class="pg-kind">${mystOf(day).name} ${dan+1}단</div><div class="pg-title">성모송 <span style="font-size:15px;color:var(--mute)">10번</span></div>
+   <div class="prayer hailtext"><p>${COMMON.hail}</p></div>
+   <div class="decade ${n>=10?"full":""}" id="decade">
+     <div class="rays"></div>
+     <svg class="ring" viewBox="0 0 300 300"><circle cx="150" cy="150" r="118" fill="none" stroke="#d9cdb2" stroke-width="2"/>
+       <circle cx="150" cy="150" r="118" fill="none" stroke="url(#gg)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(2*Math.PI*118).toFixed(1)}" stroke-dashoffset="${((1-n/10)*2*Math.PI*118).toFixed(1)}" transform="rotate(-90 150 150)" id="ringFill"/>
+       <defs><linearGradient id="gg"><stop offset="0" stop-color="#e8cf8f"/><stop offset="1" stop-color="#b98d2e"/></linearGradient></defs></svg>
+     ${beads}
+     <div class="core" id="core">${n>=10?`${DOVE}<b>성령 은총 가득</b>`:`<div class="cnt"><b id="hn">${n}</b><span>/10</span></div>`}</div>
+     <div class="sparks">${Array.from({length:14},(_,i)=>`<i style="--a:${i*360/14}deg;--d:${(i%3)*.12}s"></i>`).join("")}</div>
+   </div>
+   <div class="hailmsg" id="hailmsg">${n>=10?"성모송 10번을 모두 바쳤어요.<br>성령의 은총이 가득히 내려오기를 ✦":"한 번 바칠 때마다 아래 버튼이나 묵주알을 눌러 주세요"}</div>
+   <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="hReset" style="flex:.4">처음부터</button><button class="btn gold" id="hOne" style="flex:1" ${n>=10?"disabled":""}>성모송 한 번 바쳤어요 ✓</button></div>`;
+}
+function bindHail(dan){
+  const go=()=>{ let n=getHail(dan); if(n>=10) return; n++; setHail(dan,n); const R0=118;
+    document.querySelectorAll(".hb").forEach((b,i)=>b.classList.toggle("on",i<n));
+    const b=document.querySelectorAll(".hb")[n-1]; b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+    $("#ringFill").setAttribute("stroke-dashoffset",((1-n/10)*2*Math.PI*R0).toFixed(1));
+    if(n<10){ $("#hn").textContent=n; }
+    else { $("#decade").classList.add("full","burst"); $("#core").innerHTML=`${DOVE}<b>성령 은총 가득</b>`; $("#hailmsg").innerHTML="성모송 10번을 모두 바쳤어요.<br>성령의 은총이 가득히 내려오기를 ✦"; $("#hOne").disabled=true; try{navigator.vibrate&&navigator.vibrate([30,40,60]);}catch(e){} }
+  };
+  $("#hOne").onclick=go;
+  document.querySelectorAll(".hb").forEach(b=>b.onclick=()=>{ if(+b.dataset.hb===getHail(dan)) go(); });
+  $("#hReset").onclick=()=>{ setHail(dan,0); drawReader(); };
+}
+function pageHTML(day,pg){
+  const mys=mystOf(day);
+  switch(pg.kind){
+  case "sign": return `<div class="pg-kind">성호경</div><div class="pg-title" style="font-size:42px;margin:30px 0 10px">✚</div>
+    <div class="prayer center" style="font-size:22px;margin-top:20px"><p>${SIGN}</p></div>
+    <p class="note" style="margin-top:30px">십자 성호를 그으며 기도를 시작합니다.</p>`;
+  case "contrition": return `<div class="pg-kind">통회기도</div><div class="pg-title">통회기도</div><div class="prayer">${CONTRITION.map(p=>`<p>${p}</p>`).join("")}</div>`;
+  case "petition": { const P=PETITION[day-1]; return `<div class="pg-kind">제${day}일</div><div class="pg-title">어머니께 드리는 청원</div>
+    ${openKnotsHTML()}<div class="prayer">${paras(P.t)}</div><div class="quote">${esc(P.q)}<small>— ${esc(P.by)}</small></div>`; }
+  case "final": return `<div class="pg-kind">매일 마지막 기도</div><div class="pg-title">매듭을 푸시는 성모님께<br>드리는 기도</div>
+    ${openKnotsHTML()}<div class="prayer verse">${FINAL.map(st=>`<p style="margin-bottom:16px">${st.map(rub).join("<br>")}</p>`).join("")}</div>`;
+  }
+  const it=mys.items[pg.dan], mi=(day-1)%4, head=`<div class="pg-kind">${mys.name} · ${pg.dan+1}단</div>`;
+  switch(pg.kind){
+  case "pic": return `${head}<div class="pg-dan">${pg.dan+1}<span style="font-size:18px">단</span></div>
+    <div class="pg-title" style="font-size:20px;margin:8px 0 14px">${esc(it.t)}</div>
+    <div class="paint"><img src="img/m${mi}-${pg.dan}.webp" alt="${esc(it.t)}"></div>
+    <div class="scrip">${esc(it.s)}<small>(${it.r})</small></div>`;
+  case "medit": return `${head}<div class="pg-title" style="font-size:19px">${esc(it.t)}</div>
+    <div class="medit">${it.m.split("\n").map(p=>`<p style="margin:0 0 12px">${esc(p)}</p>`).join("")}</div>`;
+  case "lord": return `${head}<div class="pg-title">주님의 기도</div><div class="prayer"><p>${COMMON.lord}</p></div>`;
+  case "hail": return hailPageHTML(day,pg.dan);
+  case "glory": return `${head}<div class="pg-title">영광송</div><div class="prayer center" style="margin-top:30px"><p>${COMMON.glory}</p></div>`;
+  case "fatima": return `${head}<div class="pg-title">구원을 비는 기도</div><div class="prayer center" style="margin-top:30px"><p>${COMMON.fatima}</p></div>
+    `;
+  case "queen": return `${head}<div class="pg-title">묵주기도의 모후께<br>청하는 기도</div>
+    <div class="final-p" style="font-size:18px;line-height:2;margin-top:24px">${esc(it.p)}</div>
+    <p class="note" style="margin-top:28px">${pg.dan+1}단을 마칩니다.</p>`;
+  }
+}
+function drawReader(){
+  const {day,p,ctx}=R, ch=ctx?progOf(ctx):Array(9).fill(false), pg=PAGES[p];
+  const sub = pg ? (DAN[pg.step]!==undefined? `${pg.dan+1}단 · ${DAN_PAGE_NAMES[pg.kind]} (${pg.j+1}/7)` : STEPS[pg.step]) : "마침";
+  $("#rTitle").innerHTML=`<b>제${day}일 · ${mystOf(day).name}</b>${sub}${ctx?"":" · 읽기 모드"}`;
+  $("#rDots").innerHTML=STEPS.map((_,k)=>`<i class="${pg&&k===pg.step?"on":ch[k]?"ok":""}"></i>`).join("")+`<div class="rbar"><i style="width:${Math.min(100,p/PAGES.length*100)}%"></i></div>`;
+  const body=$("#rBody");
+  if(!pg){
+    body.innerHTML=`<div class="donebanner"><div style="width:160px;margin:0 auto;border-radius:14px;overflow:hidden;aspect-ratio:381/524;box-shadow:0 10px 30px #0003">${maryHTML()}</div>
+      <div class="pg-title" style="margin-top:20px">제${day}일 기도를 마쳤습니다</div>
+      <div class="prayer center" style="font-size:16px"><p>${greet(who())}</p></div>
+      ${ctx?`<p class="note">${doneCnt(ctx)}/9 체크됨${doneCnt(ctx)===9?" · 내일은 제"+dayOfK(ctx+1)+"일 기도예요":""}</p>`:""}</div>`;
+    $("#rPrev").style.visibility="visible"; $("#rNext").textContent="닫기"; body.scrollTop=0; return;
+  }
+  body.innerHTML=pageHTML(day,pg)+(ctx?"":`<p class="readmode">읽기 모드예요. 오늘 기도로 들어오면 자동으로 체크돼요.</p>`);
+  body.scrollTop=0;
+  $("#rPrev").style.visibility=p===0?"hidden":"visible";
+  $("#rNext").textContent = pg.last ? (ctx?`${DAN[pg.step]!==undefined?pg.dan+1+"단":""} 마침 ✓  다음 ›`.trim():"다음 ›") : "다음 ›";
+  if(pg.kind==="hail") bindHail(pg.dan);
+}
+/* 스와이프 */
+(()=>{let x0=null,y0=null;const b=$("#rBody");
+ b.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+ b.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6){ if(dx<0) $("#rNext").click(); else if(R.p>0) $("#rPrev").click(); } x0=null;});})();
+
+/* =================== 매듭 =================== */
+let knotTab="open", editId=null;
+function photoSlot(key,label,fallback){
+  const src=S[key]||fallback;
+  return `<label class="pslot">${src?`<img src="${src}" alt="${label}">`:`<span class="ph">＋<br>${label} 사진</span>`}
+    <input type="file" accept="image/*" hidden data-photo="${key}"><em>${label}</em></label>`;
+}
+function renderKnots(){
+  const open=S.knots.filter(k=>!k.done).length, done=S.knots.filter(k=>k.done).length;
+  const list=S.knots.filter(k=>knotTab==="open"?!k.done:k.done).sort((a,b)=>b.id-a.id);
+  const ed=editId?S.knots.find(k=>k.id===editId):null;
+  $("#v-knot").innerHTML=`
+   <div class="card bond">
+     <div class="bond-h">성모님 손에 맡긴 매듭</div>
+     <div class="bond-row">
+       ${photoSlot("photoMe","나",null)}
+       <div class="thread"><svg viewBox="0 0 120 60"><path d="M0 30 C20 10 30 50 50 30" stroke="#b98d2e" stroke-width="2.5" fill="none"/>
+         ${open?'<circle cx="60" cy="30" r="9" fill="none" stroke="#b98d2e" stroke-width="2.5"/><path d="M52 24 L68 36 M52 36 L68 24" stroke="#b98d2e" stroke-width="2"/>':'<path d="M50 30 C56 30 64 30 70 30" stroke="#b98d2e" stroke-width="2.5"/>'}
+         <path d="M70 30 C90 50 100 10 120 30" stroke="#b98d2e" stroke-width="2.5" fill="none"/></svg>
+         <small>${open?`맡긴 매듭 ${open}`:"매듭이 없어요"}${done?` · 풀림 ${done}`:""}</small></div>
+       ${photoSlot("photoMary","성모님","img/mary2.jpg")}
+     </div>
+     <p class="note" style="margin:8px 0 0">사진을 누르면 바꿀 수 있어요</p>
+   </div>
+   <div class="card">
+     <div style="font-family:'Gowun Batang',serif;font-size:18px;color:var(--blue)">${ed?"매듭 고치기":"새 매듭 맡기기"}</div>
+     <div class="field"><label>지금 겪고 있는 매듭</label><textarea id="kKnot" rows="3" placeholder="예) 가족과의 관계 속 오해가 풀리기를">${ed?esc(ed.knot):""}</textarea></div>
+     <div class="field"><label>매듭이 풀리는 날, 나의 소원과 약속</label><textarea id="kWish" rows="3" placeholder="예) 매듭이 풀리면 감사의 미사를 봉헌하겠습니다">${ed?esc(ed.wish||""):""}</textarea></div>
+     <div style="display:flex;gap:8px;margin-top:12px">${ed?'<button class="btn ghost" id="kCancel">취소</button>':""}<button class="btn pri" id="kSave" style="flex:1">${ed?"고친 내용 저장":"성모님께 맡기기"}</button></div>
+   </div>
+   <div class="seg"><button data-kt="open" class="${knotTab==="open"?"on":""}">맡긴 매듭 ${open}</button><button data-kt="done" class="${knotTab==="done"?"on":""}">풀린 매듭 ${done}</button></div>
+   ${list.length?list.map(k=>`<div class="card knot ${k.done?"done":""}">
+      <div class="date">${fmt(k.date)}에 맡김${k.done?`<span class="ribbon">${fmt(k.doneDate)} 풀림 ✿</span>`:""}</div>
+      <div class="k1">${esc(k.knot)}</div>${k.wish?`<div class="k2">${esc(k.wish)}</div>`:""}
+      <div class="acts"><button data-kd="${k.id}">${k.done?"다시 맡기기":"✿ 매듭이 풀렸어요"}</button><button data-ke="${k.id}">고치기</button><button data-kx="${k.id}">지우기</button></div>
+      <div id="cf${k.id}" style="display:none;margin-top:10px;font-size:13px">정말 지울까요? <button class="btn ghost" style="padding:6px 10px;font-size:12.5px" data-kxy="${k.id}">지우기</button> <button class="btn ghost" style="padding:6px 10px;font-size:12.5px" data-kxn="${k.id}">아니요</button></div>
+     </div>`).join(""):`<p class="note" style="margin:24px 0">${knotTab==="open"?"아직 맡긴 매듭이 없어요.<br>여기 적은 매듭은 청원 기도 화면에도 함께 보여요.":"풀린 매듭이 생기면 여기에 모여요."}</p>`}`;
+  document.querySelectorAll("[data-photo]").forEach(inp=>inp.onchange=e=>{ const f=e.target.files[0]; if(!f) return; resizeFile(f,700,url=>{ S[inp.dataset.photo]=url; save(); renderKnots(); toast("사진을 넣었어요"); }); });
+  $("#kSave").onclick=()=>{ const kn=$("#kKnot").value.trim(), w=$("#kWish").value.trim(); if(!kn){toast("매듭 내용을 적어 주세요");return;}
+    if(ed){ed.knot=kn;ed.wish=w;editId=null;toast("고쳤어요");} else {S.knots.push({id:Date.now(),date:TODAY,knot:kn,wish:w,done:false});knotTab="open";toast("성모님께 매듭을 맡겼어요");}
+    save();renderKnots(); };
+  if(ed) $("#kCancel").onclick=()=>{editId=null;renderKnots();};
+  document.querySelectorAll("[data-kt]").forEach(b=>b.onclick=()=>{knotTab=b.dataset.kt;renderKnots();});
+  document.querySelectorAll("[data-kd]").forEach(b=>b.onclick=()=>{const k=S.knots.find(x=>x.id==b.dataset.kd);k.done=!k.done;k.doneDate=k.done?TODAY:null;save();if(k.done)toast("감사합니다, 성모님 ✿");renderKnots();});
+  document.querySelectorAll("[data-ke]").forEach(b=>b.onclick=()=>{editId=+b.dataset.ke;renderKnots();window.scrollTo(0,0);});
+  document.querySelectorAll("[data-kx]").forEach(b=>b.onclick=()=>{$("#cf"+b.dataset.kx).style.display="block";});
+  document.querySelectorAll("[data-kxn]").forEach(b=>b.onclick=()=>{$("#cf"+b.dataset.kxn).style.display="none";});
+  document.querySelectorAll("[data-kxy]").forEach(b=>b.onclick=()=>{S.knots=S.knots.filter(x=>x.id!=b.dataset.kxy);save();renderKnots();});
+}
+
+/* =================== 설정 =================== */
+$("#setBtn").onclick=()=>openSettings(false);
+function openSettings(first){
+  $("#sheet").innerHTML=`<h3>${first?"환영합니다 ✿":"설정"}</h3>${first?'<p class="note" style="text-align:left;margin:2px 0 6px">처음 한 번만 이름과 세례명, 오늘이 몇 일차인지 적어 주세요. 나중에 오른쪽 위 ⚙에서 언제든 바꿀 수 있어요.</p>':""}
+   <div class="field"><label>첫 화면 인사 · 이름과 세례명</label>
+     <div style="display:flex;gap:8px"><input type="text" id="sUname" placeholder="이름 (예: 서한나)" value="${esc(S.uname||"")}" style="flex:1.2">
+     <input type="text" id="sBname" placeholder="세례명 (예: 안나)" value="${esc(S.bname||"")}" style="flex:1"></div>
+     <div class="greetprev" id="sGreet"></div></div>
+   <div class="field"><label>오늘(${fmt(TODAY)})은 누적 몇 일차인가요?</label><input type="text" inputmode="numeric" id="sK" value="${kToday()}"></div>
+   <p class="note" id="sPrev" style="text-align:left"></p>
+   <div class="field"><label>첫 화면 성화</label>
+    <div style="display:flex;gap:12px;align-items:center"><div class="thumb">${maryHTML()}</div>
+    <div style="display:flex;flex-direction:column;gap:8px"><label class="btn ghost" style="font-size:13.5px;padding:9px 12px">다른 사진 고르기<input type="file" id="sImg" accept="image/*" hidden></label>
+    ${S.img?'<button class="btn ghost" id="sImgDel" style="font-size:13.5px;padding:9px 12px">원래 성화로</button>':""}</div></div></div>
+   <div style="display:flex;gap:8px;margin-top:18px"><button class="btn ghost" id="sClose" style="flex:.5">닫기</button><button class="btn pri" id="sSave" style="flex:1">저장</button></div>`;
+  const upd=()=>{const n=parseInt($("#sK").value,10); $("#sPrev").textContent= n>=1?`→ 오늘은 제${dayOfK(n)}일 ${mystOf(dayOfK(n)).name}`:"→ 1 이상의 숫자를 적어 주세요";};
+  $("#sK").oninput=upd; upd();
+  const gp=()=>{ const n=[$("#sUname").value,$("#sBname").value].map(x=>x.trim()).filter(Boolean).join(" "); $("#sGreet").innerHTML=greet(n); };
+  $("#sUname").oninput=gp; $("#sBname").oninput=gp; gp();
+  $("#sImg").onchange=e=>{const f=e.target.files[0]; if(!f)return; resizeFile(f,800,url=>{ S.img=url; save(); $("#setBtn").click(); toast("성화를 바꿨어요"); }); };
+  if(S.img) $("#sImgDel").onclick=()=>{S.img=null;save();$("#setBtn").click();};
+  $("#sClose").onclick=()=>$("#modal").classList.remove("on");
+  $("#sSave").onclick=()=>{ S.uname=$("#sUname").value.trim(); S.bname=$("#sBname").value.trim(); $("#splashText") && ($("#splashText").innerHTML=greet(who())); const n=parseInt($("#sK").value,10);
+    if(n>=1 && n!==kToday()){ const cur=kToday(), old=progOf(cur); S.anchor=TODAY; S.anchorK=n; if(!S.prog[n] && old.some(Boolean)) S.prog[n]=old; }
+    save(); $("#modal").classList.remove("on"); rerender(); toast("저장했어요"); };
+  $("#modal").classList.add("on");
+}
+$("#modal").onclick=e=>{ if(e.target.id==="modal") $("#modal").classList.remove("on"); };
+
+
+/* 안드로이드 뒤로가기 · 날짜 바뀌면 새로고침 */
+window.__back=function(){
+  if($("#modal").classList.contains("on")){ $("#modal").classList.remove("on"); return true; }
+  if($("#reader").classList.contains("on")){ closeReader(); return true; }
+  if(curView==="pray" && praySel){ praySel=null; renderPray(); return true; }
+  if(curView!=="cal"){ show("cal"); return true; }
+  return false;
+};
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && ymd(new Date())!==TODAY) location.reload(); });
+renderCal();
+
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }); }
+</script>
+</body>
+</html>
