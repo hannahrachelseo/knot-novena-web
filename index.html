@@ -221,6 +221,8 @@ details .prayer{font-size:16px;padding-bottom:12px}
 .thread svg{width:100%}
 .thread small{font-size:11px;color:var(--gold);display:block;margin-top:-4px}
 .greetprev{margin-top:8px;font-family:'Gowun Batang',serif;font-size:14px;line-height:1.7;text-align:center;color:#fff;background:linear-gradient(180deg,#1c2f5e,#3a5aa0);border-radius:12px;padding:12px}
+.credit{text-align:center;font-size:11px;letter-spacing:.6px;color:#a59b84;padding:6px 0 14px;font-family:'Gowun Batang',serif}
+.hailmsg small{font-size:11.5px;color:#a59b84}
 </style>
 </head>
 <body>
@@ -235,6 +237,7 @@ details .prayer{font-size:16px;padding-bottom:12px}
   <section class="view on" id="v-cal"></section>
   <section class="view" id="v-pray"></section>
   <section class="view" id="v-knot"></section>
+  <footer class="credit">Crafted By. Hannah Seo</footer>
 </div>
 
 <nav class="tabs">
@@ -372,6 +375,8 @@ const FINAL = [
 
 /* =================== 상태 =================== */
 const KEY = "knotNovena.v2";
+/* 안드로이드 앱 업데이트: 예전 앱(내장 버전)에 있던 기록을 한 번만 옮겨오기 */
+try{ if(window.KnotApp && !localStorage.getItem(KEY)){ const d=window.KnotApp.getLegacy(); if(d) localStorage.setItem(KEY,d); } }catch(e){}
 const pad=n=>String(n).padStart(2,"0");
 const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const TODAY = ymd(new Date());
@@ -594,16 +599,23 @@ function hailPageHTML(day,dan){
    <div style="display:flex;gap:8px;margin-top:12px"><button class="btn ghost" id="hReset" style="flex:.4">처음부터</button><button class="btn gold" id="hOne" style="flex:1" ${n>=10?"disabled":""}>성모송 한 번 바쳤어요 ✓</button></div>`;
 }
 function bindHail(dan){
-  const go=()=>{ let n=getHail(dan); if(n>=10) return; n++; setHail(dan,n); const R0=118;
+  const R0=118, MSG0="한 번 바칠 때마다 아래 버튼이나 묵주알을 눌러 주세요<br><small>잘못 눌렀으면 마지막 알을 한 번 더 누르면 취소돼요</small>";
+  const paint=(n,pop)=>{
     document.querySelectorAll(".hb").forEach((b,i)=>b.classList.toggle("on",i<n));
-    const b=document.querySelectorAll(".hb")[n-1]; b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+    if(pop>=0){ const b=document.querySelectorAll(".hb")[pop]; b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); }
     $("#ringFill").setAttribute("stroke-dashoffset",((1-n/10)*2*Math.PI*R0).toFixed(1));
-    if(n<10){ $("#hn").textContent=n; }
-    else { $("#decade").classList.add("full","burst"); $("#core").innerHTML=`${DOVE}<b>성령 은총 가득</b>`; $("#hailmsg").innerHTML="성모송 10번을 모두 바쳤어요.<br>성령의 은총이 가득히 내려오기를 ✦"; $("#hOne").disabled=true; try{navigator.vibrate&&navigator.vibrate([30,40,60]);}catch(e){} }
+    const d=$("#decade");
+    if(n>=10){ d.classList.add("full","burst"); $("#core").innerHTML=`${DOVE}<b>성령 은총 가득</b>`; $("#hailmsg").innerHTML="성모송 10번을 모두 바쳤어요.<br>성령의 은총이 가득히 내려오기를 ✦"; $("#hOne").disabled=true; }
+    else { d.classList.remove("full","burst"); $("#core").innerHTML=`<div class="cnt"><b id="hn">${n}</b><span>/10</span></div>`; $("#hailmsg").innerHTML=MSG0; $("#hOne").disabled=false; }
   };
+  const go=()=>{ let n=getHail(dan); if(n>=10) return; n++; setHail(dan,n); paint(n,n-1);
+    if(n>=10){ try{navigator.vibrate&&navigator.vibrate([30,40,60]);}catch(e){} } };
+  const undo=()=>{ let n=getHail(dan); if(n<=0) return; n--; setHail(dan,n); paint(n,-1); toast(`한 번 취소했어요 · ${n}/10`); };
   $("#hOne").onclick=go;
-  document.querySelectorAll(".hb").forEach(b=>b.onclick=()=>{ if(+b.dataset.hb===getHail(dan)) go(); });
-  $("#hReset").onclick=()=>{ setHail(dan,0); drawReader(); };
+  document.querySelectorAll(".hb").forEach(b=>b.onclick=()=>{ const i=+b.dataset.hb, n=getHail(dan);
+    if(i===n) go(); else if(i===n-1) undo(); });
+  $("#hReset").onclick=()=>{ setHail(dan,0); paint(0,-1); };
+  if(getHail(dan)<10) $("#hailmsg").innerHTML=MSG0;
 }
 function pageHTML(day,pg){
   const mys=mystOf(day);
